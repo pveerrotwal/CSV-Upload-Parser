@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSV Upload Processor</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 900px;
+        margin: 24px auto;
+        line-height: 1.4;
+        padding: 0 16px;
+      }
+      .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border-bottom: 1px solid #eee;
+        text-align: left;
+        padding: 8px;
+      }
+      .status {
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .status.done {
+        color: #097b20;
+      }
+      .status.failed {
+        color: #b42318;
+      }
+      .status.processing,
+      .status.queued {
+        color: #0b4f8a;
+      }
+      button {
+        padding: 8px 14px;
+        border: 0;
+        border-radius: 6px;
+        background: #0b4f8a;
+        color: white;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+      .message {
+        margin-top: 8px;
+      }
+      .link {
+        color: #0b4f8a;
+      }
+      .progress {
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>CSV Upload Processor</h1>
+
+    <div class="card">
+      <form id="uploadForm">
+        <input id="fileInput" type="file" accept=".csv" required />
+        <button id="uploadBtn" type="submit">Upload</button>
+      </form>
+      <div id="message" class="message"></div>
+    </div>
+
+    <div class="card">
+      <h2>Jobs</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Job ID</th>
+            <th>Status</th>
+            <th>Progress</th>
+            <th>Summary</th>
+            <th>Output</th>
+          </tr>
+        </thead>
+        <tbody id="jobsBody"></tbody>
+      </table>
+    </div>
+
+    <script>
+      const pollEveryMs = 2000;
+
+      const uploadForm = document.getElementById("uploadForm");
+      const fileInput = document.getElementById("fileInput");
+      const uploadBtn = document.getElementById("uploadBtn");
+      const jobsBody = document.getElementById("jobsBody");
+      const messageEl = document.getElementById("message");
+
+      function statusClass(status) {
+        return `status ${status}`;
+      }
+
+      function renderJobs(jobs) {
+        jobsBody.innerHTML = "";
+
+        if (!jobs.length) {
+          jobsBody.innerHTML = "<tr><td colspan='5'>No jobs yet</td></tr>";
+          return;
+        }
+
+        jobs.forEach((job) => {
+          const tr = document.createElement("tr");
+
+          const progressText = `${job.processed_rows}/${job.total_rows || 0}`;
+          const summary = `valid ${job.valid_rows}, invalid ${job.invalid_rows}`;
+          const output =
+            job.status === "done" && job.output_url
+              ? `<a class="link" href="${job.output_url}" target="_blank">Open CSV</a>`
+              : "-";
+
+          tr.innerHTML = `
+            <td title="${job.job_id}">${job.job_id.slice(0, 8)}...</td>
+            <td><span class="${statusClass(job.status)}">${job.status}</span></td>
+            <td class="progress">${progressText}</td>
+            <td>
+              ${summary}
+              ${job.error_message ? `<div>${job.error_message}</div>` : ""}
+            </td>
+            <td>${output}</td>
+          `;
+
+          jobsBody.appendChild(tr);
+        });
+      }
+
+      async function fetchJobs() {
+        const response = await fetch("/jobs");
+        if (!response.ok) {
+          return;
+        }
+        const jobs = await response.json();
+        renderJobs(jobs);
+      }
+
+      uploadForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (!fileInput.files.length) {
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        uploadBtn.disabled = true;
+        messageEl.textContent = "Uploading...";
+
+        try {
+          const response = await fetch("/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          const body = await response.json();
+          if (!response.ok) {
+            messageEl.textContent = body.detail || "Upload failed";
+            return;
+          }
+
+          messageEl.textContent = body.deduplicated
+            ? `File already submitted. Existing job: ${body.job_id}`
+            : `Job queued: ${body.job_id}`;
+
+          fileInput.value = "";
+          await fetchJobs();
+        } catch (error) {
+          messageEl.textContent = "Upload failed";
+        } finally {
+          uploadBtn.disabled = false;
+        }
+      });
+
+      fetchJobs();
+      setInterval(fetchJobs, pollEveryMs);
+    </script>
+  </body>
+</html>

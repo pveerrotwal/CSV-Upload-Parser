@@ -1,0 +1,13 @@
+id,date,description,amount,category
+1,03/01/24,Swiggy Order,-450,Food & Dining
+2,05/01/24,Salary Credit,95000,Income
+3,07/01/24,BEST Electricity,-2340,Utilities
+4,09/01/24,Uber Ride,-180,Transport
+5,11/01/24,Amazon Purchase,-1299,Shopping
+6,14/01/24,Zepto Groceries,-870,Groceries
+7,17/01/24,ATM Withdrawal,-5000,Cash
+8,19/01/24,PhonePe Transfer,-2000,Transfer
+9,23/01/24,HDFC Credit Card,-15000,Finance
+10,25/01/24,Freelance Payment,12000,Income
+11,26/02/24,INVALID_DATE,9900,Utilities
+12,31/03/24,this is not a number,abc,Shopping

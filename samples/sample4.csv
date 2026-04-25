@@ -1,0 +1,16 @@
+id,date,description,amount,category
+1,01/01/24,New Year Bonus,50000,Income
+2,01/01/24,New Year Party,-8500,Food & Dining
+3,01/01/24,Cab Home from Event,-650,Transport
+4,29/02/24,Leap Day Grocery,-1200,Groceries
+5,31/03/24,Quarter End Bonus,25000,Income
+6,31/12/24,Year End Bonus,100000,Income
+7,31/12/24,New Year Eve Dinner,-12000,Entertainment
+8,15/06/24,Transfer to Savings,-50000,Transfer
+9,15/06/24,Transfer from Savings,50000,Transfer
+10,04/07/24,Amazon Sale,-15670,Shopping
+11,04/07/24,Amazon Sale Return,15670,Shopping
+12,15/01/24,,0,Income
+13,16/01/24,Round-off Adjustment,-0.01,Finance
+14,17/01/24,Interest Credit,0.5,Income
+15,30/06/24,Annual Insurance,-18000,Finance

@@ -1,0 +1,11 @@
+id,date,description,amount,category,extra_col
+1,05/01/24,Salary Credit,95000,Income,
+2,07/01/24,Swiggy Order,-420,Food & Dining,
+3,09/01/24,Food Order,"₹310.00",Food & Dining,
+4,11/01/24,Uber Ride,NOT_A_NUM,Transport,
+5,13/01/24,Netflix Subscription,-649,Entertainment,
+6,14/01/24,BEST Bill,-2100,Utilities,EXTRA_COL
+7,16/01/24,ATM Withdrawal,-5000,Cash,
+8,2024-13-01,PhonePe Transfer,-2000,Transfer,
+9,20/01/24,Doctor Consultation,600,Healthcare,
+10,05/02/24,, -240,Transport,
